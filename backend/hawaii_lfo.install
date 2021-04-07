@@ -1,0 +1,11 @@
+lib: [
+  "_build/install/default/lib/hawaii_lfo/META"
+  "_build/install/default/lib/hawaii_lfo/dune-package"
+  "_build/install/default/lib/hawaii_lfo/opam"
+]
+bin: [
+  "_build/install/default/bin/hawaii_lfo_web"
+]
+doc: [
+  "_build/install/default/doc/hawaii_lfo/README.md"
+]

@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Basic Hawaii LFO simulator</title>
+    <meta charset="utf-8" />
+    <script src="main.js"></script>
+    <script type="text/javascript">
+      function addPrior(e) {
+        let b = document.createElement("div");
+        let s = document.createElement("select");
+        s.setAttribute("class", "prior_violation");
+        for (let v of [
+          "Section286_102",
+          "Section286_122",
+          "Section286_130",
+          "Section286_131",
+          "Section286_132",
+          "Section286_133",
+          "Section286_134",
+          "Other_83_135"
+        ]) {
+          let o = document.createElement("option");
+          o.appendChild(document.createTextNode(v));
+          s.appendChild(o);
+        }
+        let d = document.createElement("input");
+        d.setAttribute("class", "prior_date_of");
+        d.setAttribute("type", "date");
+        b.appendChild(document.createTextNode("Prior offense:"));
+        b.appendChild(s);
+        b.appendChild(d);
+        event.target.parentNode.insertBefore(b, event.target);
+      }
+
+      function go() {
+        let priors = [];
+        let prior_violations = document.querySelectorAll(".prior_violation");
+        let prior_dates = document.querySelectorAll(".prior_date_of");
+        for (let i = 0; i < prior_violations.length; ++i)
+          priors.push({
+            // TODO: this is not entirely accurate because of time zones --
+            // maybe JS date is not the best type to send across!
+            dateOf: new Date(prior_dates[i].value),
+            violation: prior_violations[i].value
+          });
+        let offense = {
+          dateOf: new Date(document.getElementById("catala_date_of").value),
+          violation: document.getElementById("catala_violation").value,
+        };
+        let defendant = {
+          age: document.getElementById("catala_age").value,
+          priors: priors
+        };
+
+        let b = document.getElementById("catala_output");
+        while (b.firstChild)
+          b.removeChild(b.firstChild);
+
+        let i = { offense, defendant };
+        console.log("Inputs:", i);
+
+        let o = computePenalties(i);
+        console.log("Outputs", o);
+        switch (o.kind) {
+          case "Fine500OrLoseRightToDriveUntil18":
+            b.appendChild(document.createTextNode("Defendant may EITHER lose the right to drive until 18, or be subjected to a 500$ fine"));
+            break;
+          case "TimeAndDays":
+            b.appendChild(document.createTextNode("Defendant may be subjected to time or days or both"));
+            b.appendChild(document.createElement("br"));
+            b.appendChild(document.createTextNode("Minimum fine: " + o.minFine()));
+            b.appendChild(document.createElement("br"));
+            b.appendChild(document.createTextNode("Maximum fine: " + o.maxFine()));
+            let [ , months, days ] = o.maxDays();
+            if (months > 0 || days > 0) {
+              b.appendChild(document.createElement("br"));
+              b.appendChild(document.createTextNode("Up to " + months + " months and " + days + " days"));
+            } else {
+              b.appendChild(document.createElement("br"));
+              b.appendChild(document.createTextNode("No days"));
+            }
+            break;
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Hawaii LFO calculator</h1>
+    <div id="catala_input">
+      <div>
+        Violation:
+        <select id="catala_violation">
+          <option>Section286_102</option>
+          <option>Section286_122</option>
+          <option>Section286_130</option>
+          <option>Section286_131</option>
+          <option>Section286_132</option>
+          <option>Section286_133</option>
+          <option>Section286_134</option>
+          <option>Other_83_135</option>
+        </select>
+      </div>
+      <div>
+      Date of infraction: <input type="date" id="catala_date_of"/>
+      </div>
+      <div>
+      Defendant age: <input type="number" id="catala_age" />
+      </div>
+      <a href="#" onclick="addPrior()">add prior offense</a><br />
+      <input type="submit" onclick="go()" value="compute" />
+    </div>
+    <div id="catala_output">
+    </div>
+  </body>
+</html>

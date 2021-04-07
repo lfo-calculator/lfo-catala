@@ -1,0 +1,29 @@
+> Include: Title17_MotorAndOtherVehicles.catala_en
+
+## Tests
+
+### [Tests]
+
+```catala
+
+scope Penalty286_83_135:
+
+  definition offense equals (Offense {
+    -- violation: Section286_102
+    -- date_of: |2021-03-03|
+  })
+  definition defendant equals (Defendant {
+    -- priors: [
+      (Offense {
+        -- violation: Section286_102
+        -- date_of: |2021-03-01|
+      });
+      (Offense {
+        -- violation: Section286_102
+        -- date_of: |2021-03-01|
+      })
+    ]
+    -- age: 17
+  })
+  assertion penalty = Fine500OrLoseRightToDriveUntil18
+```
